@@ -1,8 +1,13 @@
 {
+  "main": "index.js",
   "dependencies": {
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "tinkoff-invest-api": "^5.0.0"
   },
   "scripts": {
-    "start": "node index"
+    "start": "nodemon index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
