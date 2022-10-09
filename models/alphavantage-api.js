@@ -8,9 +8,20 @@ class AlphavantageApi {
         this.currency_name = currency_name;
     }
 
-    getDigitalCurrencyDaily = async function( currency_name ){
-        const response = await axios.get(`${this.api_endpoint}?function=DIGITAL_CURRENCY_DAILY&symbol=BTC&market=${this.currency_name}&apikey=${this.api_token}`);
+    associatedObject = {
+        getQuotesForAsset:{
+            func:"DIGITAL_CURRENCY_DAILY",
+            ret:"Time Series (Digital Currency Daily)",
+        }
+    }
+
+    getQuotesForAsset = async function( to_currency_name = this.currency_name, symbol = "BTC" ){
+        const response = await axios.get(`${this.api_endpoint}?function=DIGITAL_CURRENCY_DAILY&symbol=${symbol}&market=${to_currency_name}&apikey=${this.api_token}`);
         return response.data["Time Series (Digital Currency Daily)"];
+    }
+
+    getData = async function( to_currency_name = this.currency_name, symbol = "BTC" ){
+        return null;
     }
 
 }

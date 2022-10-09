@@ -6,8 +6,8 @@ const cors = require("cors");
 const bodyParser = require("express");
 const api = new AlphavantageApi()
 
-const allowedOrigins = ['*',
-    'http://localhost:3020'];
+const allowedOrigins = ['*', 'http://localhost:3020'];
+
 app.use(cors({
     origin: function(origin, callback){
         if(!origin) return callback(null, true);
@@ -19,6 +19,7 @@ app.use(cors({
     }
 
 }));
+
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -28,21 +29,28 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/get-currency-history', async (req, res) =>{
-    const result = await api.getDigitalCurrencyDaily();
+    const result = await api.getQuotesForAsset();
     res.send(result);
     res.status(200);
 });
 app.post('/api', async (req, res) =>{
 
     switch (req.body.action){
-        case "get-history":
-            const result = await api.getDigitalCurrencyDaily();
+        case "getQuotesForAsset":
+            const result = await api.getQuotesForAsset(req.body.data.currency, req.body.data.symbol);
+            res.status(200);
             res.send(result);
             break;
+        case "get-history2":
+
+            return ;
+        default:
+            res.send(req.body);
     }
-    res.status(200);
     console.log(req.body);
-    res.send(req.body);
+
+    // console.log(req.body);
+    //
 })
 
 const PORT = process.env.PORT || 3020
