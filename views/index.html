@@ -1,1 +1,13 @@
-<h1>2002</h1>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    axios.post('/api', {
+        firstName: 'Fred',
+        lastName: {f:'J', s:'T'}
+    }).then((r)=>{
+        console.log(r.data);
+    }).catch(function (error) {
+        console.log(error);
+    });
+</script>
