@@ -1,13 +1,101 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Test api</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<style>
+    html, body{
+        margin:0;
+        padding: 0;
+    }
+    #main{
+        display: flex;
+        justify-content: center;
+    }
+</style>
+<body>
+<div id="main">
+
+</div>
 
 <script>
-    axios.post('/api', {
-        firstName: 'Fred',
-        lastName: {f:'J', s:'T'}
-    }).then((r)=>{
-        console.log(r.data);
-    }).catch(function (error) {
-        console.log(error);
-    });
+
+
+    async function sendPostData(dataObject){
+        try{
+            const response = await axios.post('/api', dataObject);
+            return response.data;
+        }catch (e){
+            console.error(e);
+            return 'Error in sendPostData';
+        }
+    }
+
+
+    const form = document.createElement('form');
+
+    const actionInput = document.createElement('input');
+    actionInput.setAttribute('name', 'action');
+    actionInput.setAttribute('placeholder', 'action');
+    // actionInput.classList.add('val');
+    form.appendChild(actionInput);
+
+    for(let i=0; i<10; i++){
+        const div = document.createElement('div');
+        const dataKeyInput = document.createElement('input');
+        dataKeyInput.setAttribute('name', `key_${i}`);
+        dataKeyInput.setAttribute('placeholder', `key_${i}`);
+
+        const dataValue = document.createElement('input');
+        dataValue.setAttribute('name', `val_${i}`);
+        dataValue.setAttribute('placeholder', `val_${i}`);
+        dataValue.classList.add('val');
+
+        div.appendChild(dataKeyInput);
+        div.appendChild(dataValue);
+        form.appendChild(div);
+
+        ['change', 'keyup'].forEach((ev) => {
+            dataKeyInput.addEventListener(ev, ()=>{
+                dataValue.setAttribute('name', dataKeyInput.value);
+            });
+        });
+    }
+
+
+    const submitBtn = document.createElement('input');
+    submitBtn.setAttribute('type', 'submit');
+    submitBtn.innerText = "Submit";
+
+
+    form.appendChild(submitBtn);
+
+    const main = document.getElementById('main');
+    main.appendChild(form);
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        let data = {};
+        let inps = document.querySelectorAll("input, select, textarea")
+        for (let q=0; q<inps.length; ++q) {
+            if (inps[q].value !== "" && inps[q].classList.contains('val') ) {
+                // console.log("%s = %s", inps[q].name, inps[q].value)
+                data[inps[q].name] = inps[q].value;
+            }
+        }
+
+        let dataToSend = {
+            action: actionInput.value,
+            data
+        }
+
+        const response = await sendPostData(dataToSend);
+
+        console.log(response);
+    })
 </script>
+
+</body>
+</html>
