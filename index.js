@@ -5,6 +5,7 @@ const AlphavantageApi = require("./models/alphavantage-api")
 const cors = require("cors");
 const bodyParser = require("express");
 const api = new AlphavantageApi()
+const db = require("./models/temp-db");
 
 const allowedOrigins = ['*', 'http://localhost:3020', 'http://localhost:3000/'];
 
@@ -30,10 +31,15 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'))
 })
 
-app.get('/api/get-currency-history', async (req, res) =>{
-    const result = await api.getQuotesForAsset();
-    res.send(result);
-    res.status(200);
+app.get('/api/get-crypto-assets-list', async (req, res) =>{
+    const assetsList = db.crypto.map((el) => {
+        return {from:el.name, to:"USD"}
+    });
+    setTimeout(()=>{
+        res.status(200);
+        res.send(assetsList);
+    }, 1500)
+
 });
 app.post('/api', async (req, res) =>{
 

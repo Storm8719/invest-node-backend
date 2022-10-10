@@ -20,7 +20,7 @@ class AlphavantageApi {
         const seriesObj = response.data["Time Series (Digital Currency Daily)"];
         let seriesArr = [];
         for (let key in seriesObj){
-            seriesArr.push({time:key, open: seriesObj[key]["1a. open (USD)"], high: seriesObj[key]["2a. high (USD)"], low: seriesObj[key]["3a. low (USD)"], close: seriesObj[key]["4a. close (USD)"] });
+            seriesArr.unshift({time:key, open: seriesObj[key]["1a. open (USD)"], high: seriesObj[key]["2a. high (USD)"], low: seriesObj[key]["3a. low (USD)"], close: seriesObj[key]["4a. close (USD)"] });
         }
         return seriesArr;
     }
