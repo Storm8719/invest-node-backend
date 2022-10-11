@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('../config')
+const db = require("./temp-db");
 
 class AlphavantageApi {
     constructor(currency_name = "USD", api_token = config.alphavantage_api_token) {
@@ -15,7 +16,8 @@ class AlphavantageApi {
         }
     }
 
-    getQuotesForAsset = async function( to_currency_name = this.currency_name, symbol = "BTC" ){
+    getQuotesForAsset = async function( to_currency_name = this.currency_name, assetId = 1){
+        const symbol = db.crypto.filter(e => e.id === +assetId)[0].name;
         const response = await axios.get(`${this.api_endpoint}?function=DIGITAL_CURRENCY_DAILY&symbol=${symbol}&market=${to_currency_name}&apikey=${this.api_token}`);
         const seriesObj = response.data["Time Series (Digital Currency Daily)"];
         let seriesArr = [];
