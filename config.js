@@ -1,5 +1,7 @@
 const config = {
-    alphavantage_api_token: 'demo'
+    alphavantage_api_token: 'demo',
+    tinkoff_api_sandbox_token: "demo",
+    tinkoff_api_token: "demo"
 }
 
-module.exports = config;
+export default config;
