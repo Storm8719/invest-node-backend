@@ -7,9 +7,13 @@
     "tinkoff-invest-api": "^5.0.0"
   },
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "dev": "nodemon --exec babel-node index.js"
   },
   "devDependencies": {
+    "@babel/core": "^7.19.3",
+    "@babel/node": "^7.19.1",
+    "@babel/preset-env": "^7.19.4",
     "nodemon": "^2.0.20"
   }
 }
