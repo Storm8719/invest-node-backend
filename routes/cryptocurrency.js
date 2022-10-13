@@ -1,8 +1,9 @@
-const {Router} = require('express')
+import {Router} from "express"
+import AlphavantageApi from "../models/alphavantage-api";
+import db from "../models/temp-db";
+
 const router = Router()
-const AlphavantageApi = require("../models/alphavantage-api")
 const api = new AlphavantageApi()
-const db = require("../models/temp-db");
 
 router.get('/get-crypto-assets-list', async (req, res) =>{
     const assetsList = db.crypto.map((el) => {
@@ -29,4 +30,4 @@ router.post('/', async (req, res) =>{
 })
 
 
-module.exports = router
+export default router;

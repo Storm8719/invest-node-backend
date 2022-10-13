@@ -1,6 +1,8 @@
-const axios = require('axios');
-const config = require('../config')
 const db = require("./temp-db");
+
+import axios from "axios";
+import config from "../config";
+
 
 class AlphavantageApi {
     constructor(currency_name = "USD", api_token = config.alphavantage_api_token) {
