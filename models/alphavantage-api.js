@@ -1,4 +1,4 @@
-const db = require("./temp-db");
+import db from "./temp-db";
 
 import axios from "axios";
 import config from "../config";
