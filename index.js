@@ -1,4 +1,7 @@
-// import api from "./models/tinkoff-api";
+import config from "./config";
+
+process.env.HTTP_PROXY=config.proxy;
+process.env.HTTPS_PROXY=config.proxy;
 
 import express from "express";
 import path from "path";
@@ -19,30 +22,38 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'))
 })
 
-app.get('/sandbox-accounts', async (req, res) => {
+app.get('/getSandboxAccounts', async (req, res) => {
     res.status(200);
     const accounts = await api.getSandboxAccounts();
-    res.send('123');
+    res.send(accounts);
 })
 
 app.get('/openNewSandboxAccount', async (req, res) => {
     res.status(200);
-    const accounts = await api.openNewSandboxAccount();
-    res.send('123');
+    const newAccount = await api.openNewSandboxAccount();
+    res.send(newAccount);
 })
 
 app.get('/ip', async (req, res) => {
+    const result = await api.getIp();
     res.status(200);
-    const result = await axios.get('http://ip-api.com/json/');
     console.log(result);
-    res.send(result.data);
+    res.send(result);
 })
 
 
-app.get('/users', async (req, res) => {
-    res.status(200);
+app.get('/getRealAccounts', async (req, res) => {
     const accounts = await api.getRealAccounts();
-    res.send('123');
+    res.status(200);
+    res.send(accounts);
+})
+
+app.get('/subscribeOnCandles', async (req, res) => {
+    const unsubscribeOnCandles = api.subscribeOnCandles((candle) => {
+        console.log(candle);
+    });
+    res.status(200);
+    res.send('subscribeOnCandles');
 })
 
 const PORT = process.env.PORT || 3020

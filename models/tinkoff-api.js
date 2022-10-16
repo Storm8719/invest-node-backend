@@ -1,12 +1,10 @@
-import { TinkoffInvestApi, SandboxAccount } from 'tinkoff-invest-api';
+import {TinkoffInvestApi} from 'tinkoff-invest-api';
 import config from "../config";
+import axios from "axios";
 
-// создать клиента с заданным токеном доступа
-// const sandbox_api = new TinkoffInvestApi({ token: config.tinkoff_api_sandbox_token });
+process.env.HTTP_PROXY=config.proxy;
+process.env.HTTPS_PROXY=config.proxy;
 
-// class Api {
-//
-// }
 
 const sandbox_api = new TinkoffInvestApi({ token: config.tinkoff_api_sandbox_token });
 
@@ -16,8 +14,10 @@ const api = {
     openNewSandboxAccount : async () => {
         const {accountId} = await sandbox_api.sandbox.openSandboxAccount({});
         return accountId;
+
     },
     getSandboxAccounts: async () => {
+        console.log(process.env.HTTP_PROXY);
         const sb_accounts = await sandbox_api.sandbox.getSandboxAccounts({});
         console.log(sb_accounts);
         return sb_accounts;
@@ -27,13 +27,27 @@ const api = {
         console.log(accounts);
         return accounts;
     },
-    getSandboxApi: () => {
-        return sandbox_api;
+    getIp: async () => {
+        const https = await axios.get('https://ipapi.co/json/');
+        const http = await axios.get('http://ip-api.com/json/');
+        return {https: https.data, http: http.data}
     },
-    getUsersApi: () => {
-        return  user_api;
+    subscribeOnCandles: async (candleReceiver) => {
+        const unsubscribe = await user_api.stream.market.candles({
+            instruments: [
+                { figi: 'BBG00QPYJ5H0', interval: 1}
+            ],
+            waitingClose: false,
+        }, candleReceiver);
+
+        user_api.stream.market.on('error', error => console.log('stream error', error));
+        user_api.stream.market.on('close', error => console.log('stream closed, reason:', error));
+
+        return unsubscribe;
     }
 }
+
+
 
 // const { accounts } = await api.users.getAccounts({});
 // console.log(accounts);
