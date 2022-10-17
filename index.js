@@ -66,7 +66,16 @@ app.get('/getShares',  async (req, res) => {
     res.send(sharesList);
 });
 
-
+app.get('/getSharesFromCache', async (req, res) => {
+    res.send(db.shares_ru.map((e) =>{
+        return {
+            ticker: e.ticker,
+            name: e.name,
+            figi: e.figi,
+            sector: e.sector,
+        }
+    }));
+})
 
 const PORT = process.env.PORT || 3020
 
