@@ -35,7 +35,7 @@ const api = {
     subscribeOnCandles: async (candleReceiver) => {
         const unsubscribe = await user_api.stream.market.candles({
             instruments: [
-                { figi: 'BBG00QPYJ5H0', interval: 1}
+                { figi: "BBG004S681W1", interval: 1}
             ],
             waitingClose: false,
         }, candleReceiver);
@@ -44,6 +44,24 @@ const api = {
         user_api.stream.market.on('close', error => console.log('stream closed, reason:', error));
 
         return unsubscribe;
+    },
+    getShares: async () =>{
+        try{
+            const sharesList = await user_api.instruments.shares({});
+            return  sharesList.instruments
+                .filter(i => i.currency === "rub")
+                .map((e) => {
+                return {
+                    ticker: e.ticker,
+                    name: e.name,
+                    figi: e.figi,
+                    sector: e.sector,
+                }
+            })
+        }catch (e){
+            console.log(e)
+            return {status: "no connection"};
+        }
     }
 }
 

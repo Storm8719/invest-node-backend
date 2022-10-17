@@ -10,6 +10,7 @@ import api from "./models/tinkoff-api";
 const app = express()
 import cryptocurrency from "./routes/cryptocurrency"
 import axios from "axios";
+import db from "./models/temp-db";
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
@@ -22,7 +23,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'))
 })
 
-app.get('/getSandboxAccounts', async (req, res) => {
+app.get('/getSandboxAccounts' , async (req, res) => {
     res.status(200);
     const accounts = await api.getSandboxAccounts();
     res.send(accounts);
@@ -55,6 +56,17 @@ app.get('/subscribeOnCandles', async (req, res) => {
     res.status(200);
     res.send('subscribeOnCandles');
 })
+
+app.get('/getShares',  async (req, res) => {
+    const sharesList = await api.getShares();
+    // console.log(sharesList);
+    if(typeof sharesList.status !== "undefined" && sharesList.status === "no connection"){
+        res.status(500);
+    }
+    res.send(sharesList);
+});
+
+
 
 const PORT = process.env.PORT || 3020
 
