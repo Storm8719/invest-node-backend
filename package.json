@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "nodemon index.js",
-    "dev": "nodemon --exec babel-node index.js"
+    "dev": "NODE_ENV=dev nodemon --exec babel-node index.js"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",

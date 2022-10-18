@@ -70,6 +70,22 @@ app.get('/getShares',  async (req, res) => {
     res.send(sharesList);
 });
 
+//Method to call api methods directly
+app.get("/m", async (req, res) => {
+    if (process.env.NODE_ENV !== "dev"){
+        res.status(404);
+        res.send("404");
+        return;
+    }
+    if(typeof req.query.m !== 'undefined' && typeof api[req.query.m] === "function"){
+        const result = await api[req.query.m]();
+        res.send(result);
+    }else{
+        res.status(404);
+        res.send("404");
+    }
+})
+
 app.get('/getSharesFromCache', async (req, res) => {
     res.send(db.shares_ru.map((e) =>{
         return {
