@@ -64,11 +64,19 @@ app.get('/getSharesFromCache', async (req, res) => {
     }));
 })
 
-app.ws('/ws', function(ws, req) {
-    ws.on('message', function(msg) {
+expressWs.getWss().on('connection', (ws) => {
+    // console.log();
+    ws.on('message', (message)=>{
+        console.log('message received');
+        console.log(message);
+    })
+    console.log('Somebody connected');
+});
+
+app.ws('/ws', function(wss, req) {
+    wss.on('message', (msg) => {
         console.log(msg);
     });
-    console.log('socket');
 });
 
 app.use(graphqlHTTP({
