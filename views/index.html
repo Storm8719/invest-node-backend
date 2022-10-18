@@ -13,18 +13,57 @@
         display: flex;
         justify-content: center;
     }
+    .connected{
+        color: #009d00;
+    }
 </style>
+
 <body>
+
+<div class="websocket-block">
+    <div id="ws_connection_status">Connection</div>
+
+    <form id="ws_form">
+        <input type="text" name="data" id="send_to_ws">
+        <input type="submit">
+    </form>
+
+
+
+</div>
+
 <div>
     <p>post getQuotesForAsset</p>
     <p>get /api/get-crypto-assets-list <a href="/api/get-crypto-assets-list" target="_blank">-></a></p>
     <p>http://localhost:3020/m?m=AnyMethod</p>
 </div>
+
 <div id="main">
 
 </div>
 
 <script>
+    const ws = new WebSocket('ws://localhost:3020/ws');
+    const wsConnectionStatus = document.getElementById('ws_connection_status')
+    const wsForm = document.getElementById('ws_form')
+    const dataToWsInput = document.getElementById('send_to_ws')
+
+    ws.onopen = () => {
+        wsConnectionStatus.classList.add('connected');
+    }
+    ws.onclose = () => {
+        wsConnectionStatus.classList.remove('connected');
+        console.log(ws);
+    }
+    ws.onmessage = (message) => {
+        console.log(message)
+    }
+
+
+    wsForm.onsubmit = (ev) => {
+        ev.preventDefault()
+        ws.send(dataToWsInput.value)
+    }
 
 
     async function sendPostData(dataObject){
