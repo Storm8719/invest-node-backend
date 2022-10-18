@@ -11,10 +11,19 @@ const app = express()
 import cryptocurrency from "./routes/cryptocurrency"
 import axios from "axios";
 import db from "./models/temp-db";
+import {graphqlHTTP} from 'express-graphql';
+import schema from "./graphql/schema";
+import resolver from "./graphql/resolver";
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
+
+app.use(graphqlHTTP({
+    schema: schema,
+    rootValue: resolver,
+    graphiql: true
+}))
 
 app.use('/api', cryptocurrency);
 
