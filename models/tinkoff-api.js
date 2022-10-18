@@ -1,9 +1,10 @@
 import {TinkoffInvestApi} from 'tinkoff-invest-api';
 import config from "../config";
 import axios from "axios";
+import db from "./temp-db";
 
-process.env.HTTP_PROXY=config.proxy;
-process.env.HTTPS_PROXY=config.proxy;
+// process.env.HTTP_PROXY=config.proxy;
+// process.env.HTTPS_PROXY=config.proxy;
 
 
 const sandbox_api = new TinkoffInvestApi({ token: config.tinkoff_api_sandbox_token });
@@ -14,10 +15,8 @@ const api = {
     openNewSandboxAccount : async () => {
         const {accountId} = await sandbox_api.sandbox.openSandboxAccount({});
         return accountId;
-
     },
     getSandboxAccounts: async () => {
-        console.log(process.env.HTTP_PROXY);
         const sb_accounts = await sandbox_api.sandbox.getSandboxAccounts({});
         console.log(sb_accounts);
         return sb_accounts;
@@ -46,22 +45,11 @@ const api = {
         return unsubscribe;
     },
     getShares: async () =>{
-        try{
-            const sharesList = await user_api.instruments.shares({});
-            return  sharesList.instruments
-                .filter(i => i.currency === "rub")
-                .map((e) => {
-                return {
-                    ticker: e.ticker,
-                    name: e.name,
-                    figi: e.figi,
-                    sector: e.sector,
-                }
-            })
-        }catch (e){
-            console.log(e)
-            return {status: "no connection"};
-        }
+        const sharesList = await user_api.instruments.shares({});
+        return  sharesList.instruments.filter(i => i.currency === "rub")
+    },
+    getSharesFromCache: () => {
+        return db.shares_ru;
     }
 }
 

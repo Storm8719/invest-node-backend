@@ -1,7 +1,7 @@
 import config from "./config";
 
-process.env.HTTP_PROXY=config.proxy;
-process.env.HTTPS_PROXY=config.proxy;
+// process.env.HTTP_PROXY=config.proxy;
+// process.env.HTTPS_PROXY=config.proxy;
 
 import express from "express";
 import path from "path";
@@ -27,31 +27,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'))
 })
 
-app.get('/getSandboxAccounts' , async (req, res) => {
-    res.status(200);
-    const accounts = await api.getSandboxAccounts();
-    res.send(accounts);
-})
-
-app.get('/openNewSandboxAccount', async (req, res) => {
-    res.status(200);
-    const newAccount = await api.openNewSandboxAccount();
-    res.send(newAccount);
-})
-
-app.get('/ip', async (req, res) => {
-    const result = await api.getIp();
-    res.status(200);
-    console.log(result);
-    res.send(result);
-})
-
-
-app.get('/getRealAccounts', async (req, res) => {
-    const accounts = await api.getRealAccounts();
-    res.status(200);
-    res.send(accounts);
-})
 
 app.get('/subscribeOnCandles', async (req, res) => {
     const unsubscribeOnCandles = api.subscribeOnCandles((candle) => {
@@ -60,15 +35,6 @@ app.get('/subscribeOnCandles', async (req, res) => {
     res.status(200);
     res.send('subscribeOnCandles');
 })
-
-app.get('/getShares',  async (req, res) => {
-    const sharesList = await api.getShares();
-    // console.log(sharesList);
-    if(typeof sharesList.status !== "undefined" && sharesList.status === "no connection"){
-        res.status(500);
-    }
-    res.send(sharesList);
-});
 
 //Method to call api methods directly
 app.get("/m", async (req, res) => {
