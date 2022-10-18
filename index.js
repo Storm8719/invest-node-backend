@@ -8,6 +8,7 @@ import path from "path";
 import cors from "cors";
 import api from "./models/tinkoff-api";
 const app = express()
+const expressWs = require('express-ws')(app);
 import cryptocurrency from "./routes/cryptocurrency"
 import axios from "axios";
 import db from "./models/temp-db";
@@ -62,6 +63,13 @@ app.get('/getSharesFromCache', async (req, res) => {
         }
     }));
 })
+
+app.ws('/ws', function(ws, req) {
+    ws.on('message', function(msg) {
+        console.log(msg);
+    });
+    console.log('socket');
+});
 
 app.use(graphqlHTTP({
     schema: schema,
