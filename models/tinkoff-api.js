@@ -3,8 +3,8 @@ import config from "../config";
 import axios from "axios";
 import db from "./temp-db";
 
-// process.env.HTTP_PROXY=config.proxy;
-// process.env.HTTPS_PROXY=config.proxy;
+process.env.HTTP_PROXY=config.proxy;
+process.env.HTTPS_PROXY=config.proxy;
 
 
 const sandbox_api = new TinkoffInvestApi({ token: config.tinkoff_api_sandbox_token });
@@ -32,12 +32,16 @@ const api = {
         return {https: https.data, http: http.data}
     },
     subscribeOnCandles: async (candleReceiver) => {
+        console.log('Subscribe on candles event')
         const unsubscribe = await user_api.stream.market.candles({
             instruments: [
                 { figi: "BBG004S681W1", interval: 1}
             ],
             waitingClose: false,
-        }, candleReceiver);
+        }, (candle) => {
+            candleReceiver(candle);
+            console.log(candle);
+        });
 
         user_api.stream.market.on('error', error => console.log('stream error', error));
         user_api.stream.market.on('close', error => console.log('stream closed, reason:', error));

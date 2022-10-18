@@ -1,7 +1,7 @@
 import config from "./config";
 
-// process.env.HTTP_PROXY=config.proxy;
-// process.env.HTTPS_PROXY=config.proxy;
+process.env.HTTP_PROXY=config.proxy;
+process.env.HTTPS_PROXY=config.proxy;
 
 import express from "express";
 import path from "path";
@@ -15,6 +15,9 @@ import db from "./models/temp-db";
 import {graphqlHTTP} from 'express-graphql';
 import schema from "./graphql/schema";
 import resolver from "./graphql/resolver";
+import websocketHandler from "./ws/ws";
+import websocketServerHandler from "./ws/ws";
+import websocketController from "./ws/ws";
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
@@ -64,19 +67,12 @@ app.get('/getSharesFromCache', async (req, res) => {
     }));
 })
 
-expressWs.getWss().on('connection', (ws) => {
-    // console.log();
-    ws.on('message', (message)=>{
-        console.log('message received');
-        console.log(message);
-    })
-    console.log('Somebody connected');
-});
+new websocketController(expressWs.getWss());
 
 app.ws('/ws', function(wss, req) {
-    wss.on('message', (msg) => {
-        console.log(msg);
-    });
+    // wss.on('message', (msg) => {
+    //     console.log(msg);
+    // });
 });
 
 app.use(graphqlHTTP({
