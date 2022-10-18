@@ -19,11 +19,6 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
 
-app.use(graphqlHTTP({
-    schema: schema,
-    rootValue: resolver,
-    graphiql: true
-}))
 
 app.use('/api', cryptocurrency);
 
@@ -85,6 +80,12 @@ app.get('/getSharesFromCache', async (req, res) => {
         }
     }));
 })
+
+app.use(graphqlHTTP({
+    schema: schema,
+    rootValue: resolver,
+    graphiql: true
+}))
 
 const PORT = process.env.PORT || 3020
 
