@@ -6,7 +6,7 @@ class websocketController{
         this.connectionsList = [];
         this.activeSubscribesOnCandles = {};
         setInterval(() => {
-            console.log(this.connectionsList);
+            console.log(this.connectionsList.length);
             console.log(this.activeSubscribesOnCandles );
         }, 2000);
     }
@@ -16,6 +16,7 @@ class websocketController{
             //add ws connection to connectionsList array
             this.connectionsList.push(ws);
             ws.on('message', (message) => {
+                // message type: {action:"some_action", data:"some_data"}
                 try{
                     message = JSON.parse(message);
                     this.actions[message.action]({ws, ...message})
@@ -69,10 +70,15 @@ class websocketController{
     actions = {
         subscribeOnCandles: async ({ws, figi = 'BBG004S681W1'}) => {
             //Check if somebody have subscription on received figi
-            // if(this.activeSubscribesOnCandles.some(subscription => subscription.figi === figi)){
             if(typeof this.activeSubscribesOnCandles[figi] !== "undefined"){
-                //If we have active subscription - add connection to subscribers on this figi
-                this.activeSubscribesOnCandles[figi].subscribers.push(ws);
+                //Check if connection already in subscribers
+                if(this.activeSubscribesOnCandles[figi].subscribers.indexOf(ws) === -1){
+                    //If we have active api-subscription - add connection to subscribers on this figi
+                    this.activeSubscribesOnCandles[figi].subscribers.push(ws);
+                }else{
+                    console.log(`The connection has already subscribed to receive candles from figi:${figi}`);
+                }
+
             }else{
                 //If nobody have subscription - then subscribe via api on figi
                 const unsubscribe = await api.subscribeOnCandles((candle) => {
