@@ -31,11 +31,11 @@ const api = {
         const http = await axios.get('http://ip-api.com/json/');
         return {https: https.data, http: http.data}
     },
-    subscribeOnCandles: async (candleReceiver) => {
+    subscribeOnCandles: async (candleReceiver, figi = "BBG004S681W1") => {
         console.log('Subscribe on candles event')
         const unsubscribe = await user_api.stream.market.candles({
             instruments: [
-                { figi: "BBG004S681W1", interval: 1}
+                { figi: figi, interval: 1}
             ],
             waitingClose: false,
         }, (candle) => {
