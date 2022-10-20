@@ -1,3 +1,4 @@
+import configDev from "./config.dev";
 const config = {
     alphavantage_api_token: 'demo',
     tinkoff_api_sandbox_token: "demo",
@@ -5,4 +6,4 @@ const config = {
     proxy: 'http://user:passw@ip:port',
 }
 
-export default config;
+export default configDev

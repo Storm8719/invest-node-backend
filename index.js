@@ -10,13 +10,7 @@ import api from "./models/tinkoff-api";
 const app = express()
 const expressWs = require('express-ws')(app);
 import cryptocurrency from "./routes/cryptocurrency"
-import axios from "axios";
 import db from "./models/temp-db";
-import {graphqlHTTP} from 'express-graphql';
-import schema from "./graphql/schema";
-import resolver from "./graphql/resolver";
-import websocketHandler from "./ws/ws";
-import websocketServerHandler from "./ws/ws";
 import websocketController from "./ws/ws";
 
 app.use(express.urlencoded({extended: true}));
@@ -75,11 +69,11 @@ app.ws('/ws', function(wss, req) {
     // });
 });
 
-app.use(graphqlHTTP({
-    schema: schema,
-    rootValue: resolver,
-    graphiql: true
-}))
+// app.use(graphqlHTTP({
+//     schema: schema,
+//     rootValue: resolver,
+//     graphiql: true
+// }))
 
 const PORT = process.env.PORT || 3020
 
