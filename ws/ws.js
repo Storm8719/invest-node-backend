@@ -26,14 +26,18 @@ class websocketController{
                 }
             })
             ws.on('close', () => {
-                this.removeDiedConnectionFromSubscribers(ws);
+                this.removeDiedConnection(ws);
             })
         });
     }
 
     //when connection dies - remove it from all subscribes
-    removeDiedConnectionFromSubscribers(ws){
+    removeDiedConnection(ws){
         this.connectionsList.splice(this.connectionsList.indexOf(ws), 1);
+
+    }
+
+    unsubscribeConnectionFromCandles(ws, _figi = null){
         for (let figi in this.activeSubscribesOnCandles) {
             this.activeSubscribesOnCandles[figi].subscribers.splice(this.activeSubscribesOnCandles[figi].subscribers.indexOf(ws), 1);
             //If figi have no active subscribers - close api subscribe
@@ -89,6 +93,9 @@ class websocketController{
             }
 
             ws.send(JSON.stringify('Try to subscribe on candles'))
+        },
+        unsubscribeFromCandles: async ({ws, figi}) => {
+
         }
     }
 }
