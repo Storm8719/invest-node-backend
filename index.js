@@ -61,6 +61,16 @@ app.get('/getSharesFromCache', async (req, res) => {
     }));
 })
 
+app.get('/api/:route', async (req, res) => {
+    if(typeof req.params.route !== 'undefined' && typeof api[req.params.route] === "function" && api[req.params.route].length === 0){
+        const result = await api[req.params.route]();
+        res.send(result);
+    }else{
+        res.status(404);
+        res.send("404");
+    }
+})
+
 new websocketController(expressWs.getWss());
 
 app.ws('/ws', function(wss, req) {
