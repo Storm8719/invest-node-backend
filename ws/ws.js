@@ -2,49 +2,60 @@ import api from "../models/tinkoff-api";
 
 class websocketController{
     constructor(wss) {
-        this.websocketServerHandler(wss);
         this.connectionsList = [];
         this.activeSubscribesOnCandles = {};
+        wss.on('connection', (ws) => {
+            new oneConnectionController(ws, this);
+        });
         setInterval(() => {
             console.log(this.connectionsList.length);
             console.log(this.activeSubscribesOnCandles );
         }, 2000);
     }
+}
 
-    websocketServerHandler = (wss) => {
-        wss.on('connection', (ws) => {
-            //add ws connection to connectionsList array
-            this.connectionsList.push(ws);
-            ws.on('message', (message) => {
-                // message type: {action:"some_action", data:"some_data"}
-                try{
-                    message = JSON.parse(message);
-                    this.actions[message.action]({ws, ...message})
-                }catch (e){
-                    console.log(e);
-                    ws.send(JSON.stringify({error: "Invalid action", details: e}));
-                }
-            })
-            ws.on('close', () => {
-                this.removeDiedConnection(ws);
-            })
-        });
-    }
+// noinspection JSUnfilteredForInLoop
+class oneConnectionController{
 
-    //when connection dies - remove it from all subscribes
-    removeDiedConnection(ws){
-        this.connectionsList.splice(this.connectionsList.indexOf(ws), 1);
+    constructor(ws, wsscInstance) {
+        this.ws = ws;
+        this.connectionsList = wsscInstance.connectionsList;
+        this.activeSubscribesOnCandles = wsscInstance.activeSubscribesOnCandles;
+        this.connectionsList.push(ws);
 
-    }
-
-    unsubscribeConnectionFromCandles(ws, _figi = null){
-        for (let figi in this.activeSubscribesOnCandles) {
-            this.activeSubscribesOnCandles[figi].subscribers.splice(this.activeSubscribesOnCandles[figi].subscribers.indexOf(ws), 1);
-            //If figi have no active subscribers - close api subscribe
-            if(!this.activeSubscribesOnCandles[figi].subscribers.length){
-                this.activeSubscribesOnCandles[figi].unsubscribe();
-                delete this.activeSubscribesOnCandles[figi];
+        this.ws.on('message', (message) => {
+            // message type: {action:"some_action", data:"some_data"}
+            try{
+                message = JSON.parse(message);
+                this.actions[message.action](message)
+            }catch (e){
+                console.log(e);
+                ws.send(JSON.stringify({error: "Invalid action", details: e}));
             }
+        })
+        ws.on('close', () => {
+            this.removeDiedConnection();
+            this.unsubscribeConnectionFromAllCandles();
+        })
+    }
+
+
+    removeDiedConnection(){
+        this.removeElementFromArray(this.connectionsList, this.ws)
+    }
+
+    unsubscribeConnectionFromAllCandles(){
+        for (let figi in this.activeSubscribesOnCandles) {
+            this.unsubscribeConnectionFromOneCandle(figi);
+        }
+    }
+
+    unsubscribeConnectionFromOneCandle(figi){
+        this.removeElementFromArray(this.activeSubscribesOnCandles[figi].subscribers, this.ws);
+        //If figi have no active subscribers - close api subscribe
+        if(!this.activeSubscribesOnCandles[figi].subscribers.length){
+            this.activeSubscribesOnCandles[figi].unsubscribe();
+            delete this.activeSubscribesOnCandles[figi];
         }
     }
 
@@ -71,14 +82,15 @@ class websocketController{
         }
     }
 
+
     actions = {
-        subscribeOnCandles: async ({ws, figi = 'BBG004S681W1'}) => {
+        subscribeOnCandles: async ({figi = 'BBG004S681W1'}) => {
             //Check if somebody have subscription on received figi
             if(typeof this.activeSubscribesOnCandles[figi] !== "undefined"){
                 //Check if connection already in subscribers
-                if(this.activeSubscribesOnCandles[figi].subscribers.indexOf(ws) === -1){
+                if(this.activeSubscribesOnCandles[figi].subscribers.indexOf(this.ws) === -1){
                     //If we have active api-subscription - add connection to subscribers on this figi
-                    this.activeSubscribesOnCandles[figi].subscribers.push(ws);
+                    this.activeSubscribesOnCandles[figi].subscribers.push(this.ws);
                 }else{
                     console.log(`The connection has already subscribed to receive candles from figi:${figi}`);
                 }
@@ -89,20 +101,24 @@ class websocketController{
                     this.routeCandleData(candle);
                 }, figi)
                 //Create subscription object for ws
-                this.activeSubscribesOnCandles[figi] = {subscribers:[ws], unsubscribe}
+                this.activeSubscribesOnCandles[figi] = {subscribers:[this.ws], unsubscribe}
             }
 
-            ws.send(JSON.stringify('Try to subscribe on candles'))
+            this.ws.send(JSON.stringify('Try to subscribe on candles'))
         },
-        unsubscribeFromCandles: async ({ws, figi}) => {
+        unsubscribeFromCandles: async ({figi}) => {
+            this.unsubscribeConnectionFromOneCandle(figi);
+        },
 
+    }
+
+    removeElementFromArray(array, el){
+        if(array.indexOf(el) !== -1){
+            array.splice(array.indexOf(el), 1)
         }
     }
+
+
 }
-
-
-
-
-
 
 export default websocketController;
