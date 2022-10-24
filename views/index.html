@@ -8,6 +8,9 @@
     html, body{
         margin:0;
         padding: 0;
+        min-height: 100vh;
+        background: black;
+        color: white;
     }
     #main{
         display: flex;
@@ -86,7 +89,7 @@
     // actionInput.classList.add('val');
     form.appendChild(actionInput);
 
-    for(let i=0; i<10; i++){
+    for(let i=0; i<3; i++){
         const div = document.createElement('div');
         const dataKeyInput = document.createElement('input');
         dataKeyInput.setAttribute('name', `key_${i}`);

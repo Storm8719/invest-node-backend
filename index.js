@@ -20,8 +20,10 @@ app.use(cors());
 
 app.use('/api', cryptocurrency);
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     res.status(200);
+    // const getCandlesHistoryWithOffset = await api.getCandles({figi:'BBG004S681W1', timeOffset:'-5h', candleInterval:2});
+    // res.send(resp);
     res.sendFile(path.join(__dirname, 'views', 'index.html'))
 })
 
