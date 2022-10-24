@@ -1,4 +1,4 @@
-import {TinkoffInvestApi} from 'tinkoff-invest-api';
+import {Helpers, TinkoffInvestApi} from 'tinkoff-invest-api';
 import config from "../config";
 import axios from "axios";
 import db from "./temp-db";
@@ -47,6 +47,13 @@ const api = {
         user_api.stream.market.on('close', error => console.log('stream closed, reason:', error));
 
         return unsubscribe;
+    },
+    getCandles: async ({figi, timeOffset = '-45m', candleInterval = 1}) => {
+        const {from, to} = Helpers.fromTo(timeOffset);
+
+        const arr = await user_api.marketdata.getCandles({figi, from, to, interval:candleInterval});
+        console.log(arr);
+        return arr;
     },
     getShares: async () =>{
         const sharesList = await user_api.instruments.shares({});
