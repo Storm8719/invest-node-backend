@@ -73,6 +73,16 @@ app.get('/api/:route', async (req, res) => {
     }
 })
 
+app.post('/api/:route', async (req, res) => {
+    if(typeof req.params.route !== 'undefined' && typeof api[req.params.route] === "function"){
+        const result = await api[req.params.route]({...req.body});
+        res.send(result);
+    }else{
+        res.status(404);
+        res.send("404");
+    }
+})
+
 new websocketController(expressWs.getWss());
 
 app.ws('/ws', function(wss, req) {
