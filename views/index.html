@@ -5,18 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <style>
-    html, body{
-        margin:0;
+    html, body {
+        margin: 0;
         padding: 0;
         min-height: 100vh;
         background: black;
         color: white;
     }
-    #main{
+
+    #main {
         display: flex;
         justify-content: center;
     }
-    .connected{
+
+    .connected {
         color: #009d00;
     }
 </style>
@@ -32,7 +34,6 @@
     </form>
 
 
-
 </div>
 
 <div>
@@ -45,6 +46,7 @@
 <div id="main">
 
 </div>
+
 
 <script>
     const ws = new WebSocket('ws://localhost:3020/ws');
@@ -70,11 +72,11 @@
     }
 
 
-    async function sendPostData(dataObject){
-        try{
+    async function sendPostData(dataObject) {
+        try {
             const response = await axios.post('/api', dataObject);
             return response.data;
-        }catch (e){
+        } catch (e) {
             console.error(e);
             return 'Error in sendPostData';
         }
@@ -89,7 +91,7 @@
     // actionInput.classList.add('val');
     form.appendChild(actionInput);
 
-    for(let i=0; i<3; i++){
+    for (let i = 0; i < 3; i++) {
         const div = document.createElement('div');
         const dataKeyInput = document.createElement('input');
         dataKeyInput.setAttribute('name', `key_${i}`);
@@ -105,7 +107,7 @@
         form.appendChild(div);
 
         ['change', 'keyup'].forEach((ev) => {
-            dataKeyInput.addEventListener(ev, ()=>{
+            dataKeyInput.addEventListener(ev, () => {
                 dataValue.setAttribute('name', dataKeyInput.value);
             });
         });
@@ -127,8 +129,8 @@
 
         let data = {};
         let inps = document.querySelectorAll("input, select, textarea")
-        for (let q=0; q<inps.length; ++q) {
-            if (inps[q].value !== "" && inps[q].classList.contains('val') ) {
+        for (let q = 0; q < inps.length; ++q) {
+            if (inps[q].value !== "" && inps[q].classList.contains('val')) {
                 // console.log("%s = %s", inps[q].name, inps[q].value)
                 data[inps[q].name] = inps[q].value;
             }
@@ -143,6 +145,46 @@
 
         console.log(response);
     })
+
+
+    let getCandlesFor3LastDays = () => {//633.291015625 ms first , 503.857177734375 ms then
+        console.time('FirstWay');
+        return new Promise(function (resolve, reject) {
+
+            let i = 0;
+
+            const promises = [];
+
+            const getPreviousDay = (date = new Date()) => {
+                const previous = new Date(date.getTime());
+                previous.setDate(date.getDate() - 1);
+                promises.push(axios.post('/api/getCandles', {
+                    figi: "BBG004S681W1",
+                    timeOffset: "-1d",
+                    baseTime: +previous
+                }));
+                i++;
+                if (i >= 3) {
+                    return false;
+                }
+                getPreviousDay(previous);
+            }
+            getPreviousDay();
+
+            Promise.all(promises).then((results) => {
+                console.log('results given')
+                let candles = [];
+                results.reverse().forEach((candlesObj) => {
+                    candles = candles.concat(candlesObj.data.candles);
+                })
+                console.timeEnd('FirstWay');
+                resolve(candles);
+            }).catch((e) => {
+                reject(e)
+            })
+        });
+    }
+
 </script>
 
 </body>
