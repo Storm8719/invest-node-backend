@@ -48,9 +48,13 @@ const api = {
 
         return unsubscribe;
     },
-    getCandles: async ({figi, timeOffset = '-45m', candleInterval = 1}) => {
-        const {from, to} = Helpers.fromTo(timeOffset);
-
+    getCandles: async ({figi, timeOffset = '-45m', candleInterval = 1, baseTime = null}) => {
+        if(!baseTime){
+            baseTime = new Date();
+        }else{
+            baseTime = new Date(baseTime);
+        }
+        const {from, to} = Helpers.fromTo(timeOffset, baseTime);
         const arr = await user_api.marketdata.getCandles({figi, from, to, interval:candleInterval});
         console.log(arr);
         return arr;
